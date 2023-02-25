@@ -13,11 +13,12 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
         [TestMethod]
         public void FindsViewSpots_OfMeshWith10kElements_InLessThan15Seconds()
         {
+            const string test10kFilePath = "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json";
+
             var averageTimeTaken = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(
-                        "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json");
+                    var mesh = MeshData.FromFile(test10kFilePath);
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 10);
 
@@ -27,11 +28,12 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
         [TestMethod]
         public void FindsViewSpots_OfMeshWith10kElements_InLessThan1Second()
         {
+            const string test10kFilePath = "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json";
+
             var averageTimeTaken = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(
-                        "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json");
+                    var mesh = MeshData.FromFile(test10kFilePath);
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 10);
 
@@ -41,19 +43,20 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
         [TestMethod]
         public void FindsViewSpots_OfMeshWith20kElements_IsLessThan3TimesHigherThanWith10k()
         {
+            const string test10kFilePath = "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json";
+            const string test20kFilePath = "./Files/mesh_x_sin_cos_20000[1][1][1][1][1][1].json";
+
             var averageTimeTakenFor10k = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(
-                        "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json");
+                    var mesh = MeshData.FromFile(test10kFilePath);
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 20);
 
             var averageTimeTakenFor20k = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(
-                        "./Files/mesh_x_sin_cos_20000[1][1][1][1][1][1].json");
+                    var mesh = MeshData.FromFile(test20kFilePath);
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 20);
 

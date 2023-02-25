@@ -1,5 +1,4 @@
 using Flauschi.Xibix.ViewSpotFinder.Data;
-using System.Text.Json;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,8 +10,9 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
         [TestMethod]
         public void ParsingTestMesh_Succeeds()
         {
-            var mesh = MeshData.FromFile(
-                "./Files/mesh[1][1][1][1][1][1].json");
+            const string testFilePath = "./Files/mesh[1][1][1][1][1][1].json";
+
+            var mesh = MeshData.FromFile(testFilePath);
 
             Assert.IsNotNull(mesh);
 
