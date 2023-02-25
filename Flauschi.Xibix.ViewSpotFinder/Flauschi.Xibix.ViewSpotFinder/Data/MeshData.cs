@@ -9,6 +9,12 @@ namespace Flauschi.Xibix.ViewSpotFinder.Data
     /// </summary>
     public class MeshData
     {
+        private static readonly JsonSerializerOptions DefaultSerializerOptions
+            = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
         public NodeData[] Nodes { get; set; } = default!;
         public ElementData[] Elements { get; set; } = default!;
         public ValueData[] Values { get; set; } = default!;
@@ -16,14 +22,16 @@ namespace Flauschi.Xibix.ViewSpotFinder.Data
         public static MeshData FromFile(
             string meshFilePath)
         {
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
             using var fileStream = File.OpenRead(meshFilePath);
-            return JsonSerializer.Deserialize<MeshData>(fileStream, jsonSerializerOptions)
+            return JsonSerializer.Deserialize<MeshData>(fileStream, DefaultSerializerOptions)
                 ?? throw new NullReferenceException($"Failed parsing mesh file '{meshFilePath}'");
+        }
+
+        public static MeshData FromString(
+            string meshFileData)
+        {
+            return JsonSerializer.Deserialize<MeshData>(meshFileData, DefaultSerializerOptions)
+                ?? throw new NullReferenceException($"Failed parsing mesh file from content '{meshFileData}'");
         }
     }
 }
