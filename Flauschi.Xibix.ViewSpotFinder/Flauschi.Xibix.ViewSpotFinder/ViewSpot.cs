@@ -5,7 +5,17 @@
     /// </summary>
     public class ViewSpot
     {
-        public int ElementId { get; set; } = default!;
-        public double Value { get; set; } = default!;
+        public int ElementId { get; }
+        public double Value { get; }
+
+        public ViewSpot(Element element)
+            : this(element.Id, element.Value)
+        { /* empty */ }
+
+        public ViewSpot(int elementId, double value)
+        {
+            ElementId = elementId;
+            Value = value;
+        }
     }
 }

@@ -6,12 +6,17 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
     [TestClass]
     public class GeneralFunctionTests
     {
+        /// <summary>
+        /// Verifies that the view spot finding code processes an input mesh
+        /// without exceptions and returns any view spots
+        /// </summary>
         [TestMethod]
         public void FindAllViewSpots_ReturnsViewSpots()
         {
             const string testFilePath = "./Files/mesh[1][1][1][1][1][1].json";
 
-            var mesh = MeshData.FromFile(testFilePath);
+            var mesh = Mesh.FromData(
+                MeshData.FromFile(testFilePath));
 
             var foundViewSpots = new ViewSpotFinder()
                 .FindAll(mesh);
@@ -19,18 +24,30 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
             Assert.IsNotNull(foundViewSpots);
         }
 
+        /// <summary>
+        /// Verifies that the view spot finding code limits the results
+        /// to the desired amount of viewspots to find
+        /// </summary>
         [TestMethod]
         public void FindingViewSpots_HonorsAmountParameter()
         {
             const string testFilePath = "./Files/mesh[1][1][1][1][1][1].json";
             const int amountOfViewSpotsToFind = 2;
 
-            var mesh = MeshData.FromFile(testFilePath);
+            var mesh = Mesh.FromData(
+                MeshData.FromFile(testFilePath));
 
-            var foundViewSpots = new ViewSpotFinder()
+            var allViewSpots = new ViewSpotFinder()
+                .FindAll(mesh);
+
+            var limitedViewSpots = new ViewSpotFinder()
                 .Find(mesh, amountOfViewSpotsToFind);
 
-            Assert.AreEqual(amountOfViewSpotsToFind, foundViewSpots.Length);
+            Assert.IsTrue(
+                allViewSpots.Length > amountOfViewSpotsToFind,
+                "The mesh used for testing must return more viewspots than the limit");
+
+            Assert.AreEqual(amountOfViewSpotsToFind, limitedViewSpots.Length);
         }
     }
 }

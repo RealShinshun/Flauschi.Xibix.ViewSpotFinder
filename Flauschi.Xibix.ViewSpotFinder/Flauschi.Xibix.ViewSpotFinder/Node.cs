@@ -9,10 +9,9 @@ namespace Flauschi.Xibix.ViewSpotFinder
         public double X { get; }
         public double Y { get; }
 
-        public ICollection<Element> Elements { get; set; }
+        public ICollection<Element> Elements { get; }
 
-        public Node(
-            NodeData nodeData)
+        public Node(NodeData nodeData)
             : this(
                   nodeData.Id,
                   nodeData.X,

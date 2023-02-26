@@ -10,6 +10,10 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
     [TestClass]
     public class PerformanceTests
     {
+        /// <summary>
+        /// Verifies the view spot finding code's performance is better than
+        /// the set, worst performing limit for equivalent python code
+        /// </summary>
         [TestMethod]
         public void FindsViewSpots_OfMeshWith10kElements_InLessThan15Seconds()
         {
@@ -18,13 +22,39 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
             var averageTimeTaken = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(test10kFilePath);
+                    var mesh = Mesh.FromData(
+                        MeshData.FromFile(test10kFilePath));
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 10);
 
             Assert.IsTrue(averageTimeTaken.TotalSeconds < 15);
         }
 
+        /// <summary>
+        /// Verifies the view spot finding code's performance is better than
+        /// the set, worst performing limit for equivalent python code taking
+        /// into account that C# code should be at least twice as fast
+        /// </summary>
+        [TestMethod]
+        public void FindsViewSpots_OfMeshWith10kElements_InLessThan7500Milliseconds()
+        {
+            const string test10kFilePath = "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json";
+
+            var averageTimeTaken = MeasureAverage(
+                () =>
+                {
+                    var mesh = Mesh.FromData(
+                        MeshData.FromFile(test10kFilePath));
+                    _ = new ViewSpotFinder().FindAll(mesh);
+                }, 10);
+
+            Assert.IsTrue(averageTimeTaken.TotalMilliseconds < 7500);
+        }
+
+        /// <summary>
+        /// Verifies the view spot finding code's performance is better than
+        /// the set, optimally performing limit for equivalent python code
+        /// </summary>
         [TestMethod]
         public void FindsViewSpots_OfMeshWith10kElements_InLessThan1Second()
         {
@@ -33,13 +63,39 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
             var averageTimeTaken = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(test10kFilePath);
+                    var mesh = Mesh.FromData(
+                        MeshData.FromFile(test10kFilePath));
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 10);
 
             Assert.IsTrue(averageTimeTaken.TotalSeconds < 1);
         }
 
+        /// <summary>
+        /// Verifies the view spot finding code's performance is better than
+        /// the set, optimally performing limit for equivalent python code taking
+        /// into account that C# code should be at least twice as fast
+        /// </summary>
+        [TestMethod]
+        public void FindsViewSpots_OfMeshWith10kElements_InLessThan500Milliseconds()
+        {
+            const string test10kFilePath = "./Files/mesh_x_sin_cos_10000[82][1][1][1][1][1][1].json";
+
+            var averageTimeTaken = MeasureAverage(
+                () =>
+                {
+                    var mesh = Mesh.FromData(
+                        MeshData.FromFile(test10kFilePath));
+                    _ = new ViewSpotFinder().FindAll(mesh);
+                }, 10);
+
+            Assert.IsTrue(averageTimeTaken.TotalMilliseconds < 500);
+        }
+
+        /// <summary>
+        /// Verifies the view spot finding code's performance for an input mesh of
+        /// 20.000 elements is not less than 3 times slower than a mesh of 10.000 elements
+        /// </summary>
         [TestMethod]
         public void FindsViewSpots_OfMeshWith20kElements_IsLessThan3TimesHigherThanWith10k()
         {
@@ -49,14 +105,16 @@ namespace Flauschi.Xibix.ViewSpotFinder.Tests
             var averageTimeTakenFor10k = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(test10kFilePath);
+                    var mesh = Mesh.FromData(
+                        MeshData.FromFile(test10kFilePath));
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 20);
 
             var averageTimeTakenFor20k = MeasureAverage(
                 () =>
                 {
-                    var mesh = MeshData.FromFile(test20kFilePath);
+                    var mesh = Mesh.FromData(
+                        MeshData.FromFile(test20kFilePath));
                     _ = new ViewSpotFinder().FindAll(mesh);
                 }, 20);
 

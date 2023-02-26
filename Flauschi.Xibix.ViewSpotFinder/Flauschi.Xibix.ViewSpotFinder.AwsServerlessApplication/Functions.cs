@@ -15,30 +15,64 @@ public class Functions
     /// Default constructor that Lambda will invoke.
     /// </summary>
     public Functions()
-    {
-    }
+    { /* empty */ }
 
     /// <summary>
-    /// A Lambda function to respond to HTTP Get methods from API Gateway
+    /// A Lambda function to respond to HTTP Post methods from API Gateway to
+    /// find <see cref="ViewSpot"/>s from <see cref="MeshData"/> provided in
+    /// <see cref="APIGatewayProxyRequest.Body"/> limiting the amount of found
+    /// <see cref="ViewSpot"/> by the query parameter 'amount'
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns>The API Gateway response.</returns>
+    /// <param name="request">The request to handle</param>
+    /// <returns>
+    /// The API Gateway response containing all found <see cref="ViewSpot"/>s
+    /// optionally limited by 'amount' or a response indicating failure
+    /// </returns>
     public APIGatewayProxyResponse FindViewSpots(
         APIGatewayProxyRequest request,
         ILambdaContext context)
     {
+        const string amountQueryParameterName = "amount";
+
         var specifiesAmountOfViewSpots =
             request.QueryStringParameters != default &&
-            request.QueryStringParameters.ContainsKey("amount");
+            request.QueryStringParameters.ContainsKey(amountQueryParameterName);
 
         var meshData = MeshData.FromString(request.Body);
+
+        try
+        {
+            meshData.Validate();
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogInformation(
+                $"Failed validation: {ex.Message}");
+
+            return new APIGatewayProxyResponse
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest,
+                Body = "\"Failed validating mesh\"",
+                Headers = new Dictionary<string, string>
+                {
+                    { "Content-Type", "text/plain" }
+                }
+            };
+        }
+
+        var mesh = Mesh.FromData(meshData);
 
         ViewSpot[] viewSpots;
 
         if (specifiesAmountOfViewSpots)
-            viewSpots = new ViewSpotFinder().Find(meshData, int.Parse(request.QueryStringParameters!["amount"]));
+        {
+            var amount = int.Parse(
+                request.QueryStringParameters![amountQueryParameterName]);
+
+            viewSpots = new ViewSpotFinder().Find(mesh, amount);
+        }
         else
-            viewSpots = new ViewSpotFinder().FindAll(meshData);
+            viewSpots = new ViewSpotFinder().FindAll(mesh);
 
         var jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -47,19 +81,17 @@ public class Functions
         };
 
         var bodyContent = JsonSerializer.Serialize(
-            viewSpots.OrderByDescending(x => x.Value),
+            viewSpots,
             jsonSerializerOptions);
 
-        var response = new APIGatewayProxyResponse
+        return new APIGatewayProxyResponse
         {
             StatusCode = (int)HttpStatusCode.OK,
             Body = bodyContent,
             Headers = new Dictionary<string, string>
             {
-                { "Content-Type", "text/plain" }
+                { "Content-Type", "application/json" }
             }
         };
-
-        return response;
     }
 }

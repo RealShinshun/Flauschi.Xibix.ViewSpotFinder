@@ -8,32 +8,39 @@ namespace Flauschi.Xibix.ViewSpotFinder
     {
         static void Main(string[] args)
         {
+            MeshData meshData;
+            string meshFilePath;
+            int amountOfViewSpotsToBeFound;
+
             try
             {
                 ParseCommandLineArguments(
                     args,
-                    out var meshFilePath,
-                    out var amountOfViewSpotsToBeFound);
+                    out meshFilePath,
+                    out amountOfViewSpotsToBeFound);
 
-                var mesh = MeshData.FromFile(meshFilePath);
-
-                var foundViewSpots = new ViewSpotFinder()
-                    .Find(mesh, amountOfViewSpotsToBeFound)
-                    .OrderByDescending(x => x.Value);
-
-                var jsonSerializerOptions = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-
-                Console.Out.Write(
-                    JsonSerializer.Serialize(foundViewSpots, jsonSerializerOptions));
+                meshData = MeshData.FromFile(meshFilePath);
+                meshData.Validate();
             }
             catch (Exception ex)
             {
                 ExitWithError(ex.Message);
+                throw;
             }
+
+            var mesh = Mesh.FromData(meshData);
+
+            var foundViewSpots = new ViewSpotFinder()
+                .Find(mesh, amountOfViewSpotsToBeFound);
+
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            Console.Out.Write(
+                JsonSerializer.Serialize(foundViewSpots, jsonSerializerOptions));
         }
 
         static void ParseCommandLineArguments(
